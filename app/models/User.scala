@@ -14,6 +14,8 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
   val db = dbConfig.db
   import dbConfig.profile.api._
 
+  def all: Future[List[User]] = db.run(Users.to[List].result)
+
   def create(email: String, password: String): Future[Int] = {
     val salt = Random.alphanumeric.take(10).mkString
     val hash = DigestUtils.md5Hex(password + salt)
@@ -33,10 +35,10 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
 
   private[models] class UsersTable(tag: Tag) extends Table[User](tag, "user") {
 
-    def id = column[Int]("ID", O.AutoInc, O.PrimaryKey)
-    def email = column[String]("EMAIL")
-    def hash = column[String]("HASH")
-    def salt = column[String]("SALT")
+    def id = column[Int]("id", O.AutoInc, O.PrimaryKey)
+    def email = column[String]("email")
+    def hash = column[String]("hash")
+    def salt = column[String]("salt")
     def * = (id, email, hash, salt) <> (User.tupled, User.unapply)
 
   }
